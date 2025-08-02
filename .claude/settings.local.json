@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx create-next-app:*)",
+      "Bash(ls:*)",
+      "Bash(mkdir:*)",
+      "Bash(.\\node_modules\\.bin\\next:*)",
+      "Bash(npm init -y)",
+      "Bash(npm install:*)",
+      "Bash(git init:*)",
+      "Bash(git add:*)"
+    ],
+    "deny": []
+  }
+}
