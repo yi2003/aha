@@ -49,7 +49,7 @@ export function SignIn({ onSuccess }: SignInProps) {
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full px-3 py-2 border border-border rounded-md bg-background"
+            className="w-full px-3 py-2 border border-[hsl(var(--border))] rounded-md bg-[hsl(var(--background))]"
             required
           />
         </div>
@@ -61,7 +61,7 @@ export function SignIn({ onSuccess }: SignInProps) {
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full px-3 py-2 border border-border rounded-md bg-background"
+            className="w-full px-3 py-2 border border-[hsl(var(--border))] rounded-md bg-[hsl(var(--background))]"
             required
           />
         </div>
@@ -73,7 +73,7 @@ export function SignIn({ onSuccess }: SignInProps) {
         <button
           type="submit"
           disabled={loading}
-          className="w-full py-2 px-4 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 disabled:opacity-50"
+          className="w-full py-2 px-4 bg-[hsl(var(--primary))] text-[hsl(var(--primary-foreground))] rounded-md hover:bg-[hsl(var(--primary))]/90 disabled:opacity-50"
         >
           {loading ? (
             <Loader2 className="w-4 h-4 animate-spin mx-auto" />
@@ -85,17 +85,17 @@ export function SignIn({ onSuccess }: SignInProps) {
       
       <div className="relative">
         <div className="absolute inset-0 flex items-center">
-          <span className="w-full border-t border-border" />
+          <span className="w-full border-t border-[hsl(var(--border))]" />
         </div>
         <div className="relative flex justify-center text-xs">
-          <span className="bg-background px-2 text-muted-foreground">Or continue with</span>
+          <span className="bg-[hsl(var(--background))] px-2 text-[hsl(var(--muted-foreground))]">Or continue with</span>
         </div>
       </div>
       
       <button
         onClick={handleGoogleSignIn}
         disabled={loading}
-        className="w-full py-2 px-4 border border-border rounded-md hover:bg-secondary disabled:opacity-50"
+        className="w-full py-2 px-4 border border-[hsl(var(--border))] rounded-md hover:bg-[hsl(var(--secondary))] disabled:opacity-50"
       >
         {loading ? (
           <Loader2 className="w-4 h-4 animate-spin mx-auto" />

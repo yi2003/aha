@@ -65,9 +65,9 @@ export function PostForm({ userId, onSuccess }: PostFormProps) {
   if (!canPost) {
     return (
       <div className="max-w-2xl mx-auto">
-        <div className="bg-secondary p-6 rounded-lg text-center">
+        <div className="bg-[hsl(var(--secondary))] p-6 rounded-lg text-center">
           <h3 className="text-lg font-semibold mb-2">Daily Limit Reached</h3>
-          <p className="text-muted-foreground">
+          <p className="text-[hsl(var(--muted-foreground))]">
             You've already shared your insight for today. Come back tomorrow!
           </p>
         </div>
@@ -81,14 +81,14 @@ export function PostForm({ userId, onSuccess }: PostFormProps) {
         <div>
           <label className="block text-sm font-medium mb-2">
             Your Insight
-            <span className="text-muted-foreground ml-2">
+            <span className="text-[hsl(var(--muted-foreground))] ml-2">
               ({content.length}/500)
             </span>
           </label>
           <textarea
             value={content}
             onChange={(e) => setContent(e.target.value.slice(0, 500))}
-            className="w-full px-3 py-2 border border-border rounded-md bg-background min-h-[120px]"
+            className="w-full px-3 py-2 border border-[hsl(var(--border))] rounded-md bg-[hsl(var(--background))] min-h-[120px]"
             placeholder="Share your best insight of the day..."
             maxLength={500}
             required
@@ -103,7 +103,7 @@ export function PostForm({ userId, onSuccess }: PostFormProps) {
             type="url"
             value={linkUrl}
             onChange={(e) => setLinkUrl(e.target.value)}
-            className="w-full px-3 py-2 border border-border rounded-md bg-background"
+            className="w-full px-3 py-2 border border-[hsl(var(--border))] rounded-md bg-[hsl(var(--background))]"
             placeholder="https://..."
           />
         </div>
@@ -113,13 +113,13 @@ export function PostForm({ userId, onSuccess }: PostFormProps) {
         )}
 
         <div className="flex items-center justify-between">
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm text-[hsl(var(--muted-foreground))]">
             One post per day. Make it count!
           </p>
           <button
             type="submit"
             disabled={loading || !content.trim()}
-            className="px-6 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 disabled:opacity-50"
+            className="px-6 py-2 bg-[hsl(var(--primary))] text-[hsl(var(--primary-foreground))] rounded-md hover:bg-[hsl(var(--primary))]/90 disabled:opacity-50"
           >
             {loading ? (
               <Loader2 className="w-4 h-4 animate-spin" />

@@ -116,7 +116,7 @@ export function Leaderboard() {
       {activeTab === 'posts' && (
         <div className="space-y-4">
           {posts.length === 0 ? (
-            <div className="text-center py-8 text-muted-foreground">
+            <div className="text-center py-8 text-[hsl(var(--muted-foreground))]">
               No posts yet today. Be the first to share an insight!
             </div>
           ) : (
@@ -151,7 +151,7 @@ export function Leaderboard() {
       {activeTab === 'users' && (
         <div className="space-y-4">
           {users.length === 0 ? (
-            <div className="text-center py-8 text-muted-foreground">
+            <div className="text-center py-8 text-[hsl(var(--muted-foreground))]">
               No users have posted today.
             </div>
           ) : (

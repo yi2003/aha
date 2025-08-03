@@ -15,12 +15,12 @@ interface HeaderProps {
 
 export function Header({ user, onAuthClick, activeTab, onTabChange }: HeaderProps) {
   return (
-    <header className="border-b border-border">
+    <header className="border-b border-[hsl(var(--border))]">
       <div className="container py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
             <h1 className="text-2xl font-bold">Aha</h1>
-            <p className="text-sm text-muted-foreground">Share your best daily insight</p>
+            <p className="text-sm text-[hsl(var(--muted-foreground))]">Share your best daily insight</p>
           </div>
           
           <nav className="flex items-center space-x-4">
@@ -28,8 +28,8 @@ export function Header({ user, onAuthClick, activeTab, onTabChange }: HeaderProp
               onClick={() => onTabChange('leaderboard')}
               className={`flex items-center space-x-2 px-3 py-2 rounded-md ${
                 activeTab === 'leaderboard' 
-                  ? 'bg-secondary text-secondary-foreground' 
-                  : 'hover:bg-secondary/50'
+                  ? 'bg-[hsl(var(--secondary))] text-[hsl(var(--secondary-foreground))]' 
+                  : 'hover:bg-[hsl(var(--secondary))]/50'
               }`}
             >
               <TrendingUp className="w-4 h-4" />
@@ -40,8 +40,8 @@ export function Header({ user, onAuthClick, activeTab, onTabChange }: HeaderProp
               onClick={() => onTabChange('fresh')}
               className={`flex items-center space-x-2 px-3 py-2 rounded-md ${
                 activeTab === 'fresh' 
-                  ? 'bg-secondary text-secondary-foreground' 
-                  : 'hover:bg-secondary/50'
+                  ? 'bg-[hsl(var(--secondary))] text-[hsl(var(--secondary-foreground))]' 
+                  : 'hover:bg-[hsl(var(--secondary))]/50'
               }`}
             >
               <Clock className="w-4 h-4" />
@@ -52,8 +52,8 @@ export function Header({ user, onAuthClick, activeTab, onTabChange }: HeaderProp
               onClick={() => onTabChange('post')}
               className={`flex items-center space-x-2 px-3 py-2 rounded-md ${
                 activeTab === 'post' 
-                  ? 'bg-secondary text-secondary-foreground' 
-                  : 'hover:bg-secondary/50'
+                  ? 'bg-[hsl(var(--secondary))] text-[hsl(var(--secondary-foreground))]' 
+                  : 'hover:bg-[hsl(var(--secondary))]/50'
               }`}
             >
               <PlusCircle className="w-4 h-4" />
@@ -62,7 +62,7 @@ export function Header({ user, onAuthClick, activeTab, onTabChange }: HeaderProp
             
             {user ? (
               <div className="flex items-center space-x-2">
-                <div className="flex items-center space-x-2 px-3 py-2 rounded-md bg-secondary">
+                <div className="flex items-center space-x-2 px-3 py-2 rounded-md bg-[hsl(var(--secondary))]">
                   <User className="w-4 h-4" />
                   <span className="text-sm">{user.user_metadata?.username || 'User'}</span>
                 </div>
@@ -71,7 +71,7 @@ export function Header({ user, onAuthClick, activeTab, onTabChange }: HeaderProp
                     await signOut()
                     window.location.reload()
                   }}
-                  className="p-2 hover:bg-secondary rounded-md"
+                  className="p-2 hover:bg-[hsl(var(--secondary))] rounded-md"
                   title="Sign out"
                 >
                   <LogOut className="w-4 h-4" />
@@ -80,7 +80,7 @@ export function Header({ user, onAuthClick, activeTab, onTabChange }: HeaderProp
             ) : (
               <button
                 onClick={onAuthClick}
-                className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90"
+                className="px-4 py-2 bg-[hsl(var(--primary))] text-[hsl(var(--primary-foreground))] rounded-md hover:bg-[hsl(var(--primary))]/90"
               >
                 Sign In
               </button>

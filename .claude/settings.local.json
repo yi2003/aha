@@ -16,7 +16,8 @@
       "Bash(npm run build)",
       "Bash(npm run build:*)",
       "Bash(npx next build:*)",
-      "Bash(touch:*)"
+      "Bash(touch:*)",
+      "Bash(rm:*)"
     ],
     "deny": []
   }

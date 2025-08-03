@@ -94,20 +94,20 @@ export function PostCard({ post, user, onUpdate }: PostCardProps) {
       <div className="flex items-start justify-between">
         <div className="flex-1">
           <div className="flex items-center space-x-2 mb-3">
-            <div className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center">
+            <div className="w-8 h-8 rounded-full bg-[hsl(var(--secondary))] flex items-center justify-center">
               <span className="text-sm font-medium">
                 {post.profiles.username?.[0]?.toUpperCase() || 'U'}
               </span>
             </div>
             <div>
               <span className="font-medium">{post.profiles.username}</span>
-              <span className="text-sm text-muted-foreground ml-2">
+              <span className="text-sm text-[hsl(var(--muted-foreground))] ml-2">
                 {formatDistanceToNow(new Date(post.created_at), { addSuffix: true })}
               </span>
             </div>
           </div>
 
-          <p className="text-foreground mb-3">{post.content}</p>
+          <p className="text-[hsl(var(--foreground))] mb-3">{post.content}</p>
 
           {post.link_url && (
             <a
@@ -123,27 +123,27 @@ export function PostCard({ post, user, onUpdate }: PostCardProps) {
         </div>
       </div>
 
-      <div className="flex items-center space-x-4 pt-4 border-t border-border">
+      <div className="flex items-center space-x-4 pt-4 border-t border-[hsl(var(--border))]">
         <button
           onClick={handleVote}
           disabled={!user || isOwnPost || voting}
           className={`flex items-center space-x-1 px-3 py-1 rounded-md ${
             hasVoted
               ? 'bg-primary text-primary-foreground'
-              : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
+              : 'bg-[hsl(var(--secondary))] text-[hsl(var(--secondary-foreground))] hover:bg-[hsl(var(--secondary))]/80'
           } disabled:opacity-50 disabled:cursor-not-allowed`}
         >
           <ArrowUp className={`w-4 h-4 ${voting ? 'animate-pulse' : ''}`} />
           <span>{post.votes}</span>
         </button>
 
-        <button className="flex items-center space-x-1 text-muted-foreground hover:text-foreground">
+        <button className="flex items-center space-x-1 text-[hsl(var(--muted-foreground))] hover:text-[hsl(var(--foreground))]">
           <MessageSquare className="w-4 h-4" />
           <span>Comments</span>
         </button>
 
         {user && !isOwnPost && (
-          <div className="text-sm text-muted-foreground">
+          <div className="text-sm text-[hsl(var(--muted-foreground))]">
             {userVotesToday}/5 votes used today
           </div>
         )}

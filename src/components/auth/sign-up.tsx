@@ -42,7 +42,7 @@ export function SignUp({ onSuccess }: SignUpProps) {
             type="text"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
-            className="w-full px-3 py-2 border border-border rounded-md bg-background"
+            className="w-full px-3 py-2 border border-[hsl(var(--border))] rounded-md bg-[hsl(var(--background))]"
             required
           />
         </div>
@@ -54,7 +54,7 @@ export function SignUp({ onSuccess }: SignUpProps) {
             type="text"
             value={fullName}
             onChange={(e) => setFullName(e.target.value)}
-            className="w-full px-3 py-2 border border-border rounded-md bg-background"
+            className="w-full px-3 py-2 border border-[hsl(var(--border))] rounded-md bg-[hsl(var(--background))]"
           />
         </div>
         <div>
@@ -65,7 +65,7 @@ export function SignUp({ onSuccess }: SignUpProps) {
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full px-3 py-2 border border-border rounded-md bg-background"
+            className="w-full px-3 py-2 border border-[hsl(var(--border))] rounded-md bg-[hsl(var(--background))]"
             required
           />
         </div>
@@ -77,7 +77,7 @@ export function SignUp({ onSuccess }: SignUpProps) {
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full px-3 py-2 border border-border rounded-md bg-background"
+            className="w-full px-3 py-2 border border-[hsl(var(--border))] rounded-md bg-[hsl(var(--background))]"
             required
           />
         </div>
@@ -89,7 +89,7 @@ export function SignUp({ onSuccess }: SignUpProps) {
         <button
           type="submit"
           disabled={loading}
-          className="w-full py-2 px-4 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 disabled:opacity-50"
+          className="w-full py-2 px-4 bg-[hsl(var(--primary))] text-[hsl(var(--primary-foreground))] rounded-md hover:bg-[hsl(var(--primary))]/90 disabled:opacity-50"
         >
           {loading ? (
             <Loader2 className="w-4 h-4 animate-spin mx-auto" />
