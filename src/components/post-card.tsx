@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
 import { ArrowUp, MessageSquare, ExternalLink } from 'lucide-react'
 import { formatDistanceToNow } from 'date-fns'
@@ -44,9 +44,9 @@ export function PostCard({ post, user, onUpdate }: PostCardProps) {
     setUserVotesToday(votesData || 0)
   }
 
-  useState(() => {
+  useEffect(() => {
     checkVoteStatus()
-  })
+  }, [user, post.id])
 
   const handleVote = async () => {
     if (!user || voting) return

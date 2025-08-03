@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
 import { Loader2 } from 'lucide-react'
 
@@ -28,9 +28,9 @@ export function PostForm({ userId, onSuccess }: PostFormProps) {
     }
   }
 
-  useState(() => {
+  useEffect(() => {
     checkCanPost()
-  })
+  }, [userId])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
