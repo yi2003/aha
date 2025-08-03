@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
-import { ArrowUp, MessageSquare, ExternalLink, Send } from 'lucide-react'
+import { ArrowUp, MessageSquare, ExternalLink, Send, Link2 } from 'lucide-react'
 import { formatDistanceToNow } from 'date-fns'
 import type { Database } from '@/types/database'
 
@@ -16,6 +16,7 @@ interface ExtendedPost extends Post {
 
 interface ExtendedComment extends Comment {
   profiles: Profile
+  replies?: ExtendedComment[]
 }
 
 interface PostCardProps {
@@ -31,6 +32,7 @@ export function PostCard({ post, user, onUpdate }: PostCardProps) {
   const [comments, setComments] = useState<ExtendedComment[]>([])
   const [showComments, setShowComments] = useState(false)
   const [newComment, setNewComment] = useState('')
+  const [replyTo, setReplyTo] = useState<string | null>(null)
   const [loadingComments, setLoadingComments] = useState(false)
   const [submittingComment, setSubmittingComment] = useState(false)
 
@@ -54,6 +56,30 @@ export function PostCard({ post, user, onUpdate }: PostCardProps) {
     setUserVotesToday(votesData || 0)
   }
 
+  const buildCommentTree = (comments: ExtendedComment[]): ExtendedComment[] => {
+    const commentMap = new Map<string, ExtendedComment>()
+    const rootComments: ExtendedComment[] = []
+
+    // First pass: create map and initialize replies
+    comments.forEach(comment => {
+      commentMap.set(comment.id, { ...comment, replies: [] })
+    })
+
+    // Second pass: organize into tree structure
+    comments.forEach(comment => {
+      if (comment.parent_id) {
+        const parent = commentMap.get(comment.parent_id)
+        if (parent && parent.replies) {
+          parent.replies.push(commentMap.get(comment.id)!)
+        }
+      } else {
+        rootComments.push(commentMap.get(comment.id)!)
+      }
+    })
+
+    return rootComments
+  }
+
   const loadComments = async () => {
     setLoadingComments(true)
     try {
@@ -64,9 +90,12 @@ export function PostCard({ post, user, onUpdate }: PostCardProps) {
         .order('created_at', { ascending: true })
 
       if (error) throw error
-      setComments(data || [])
+      const commentTree = buildCommentTree(data || [])
+      setComments(commentTree)
+      return commentTree
     } catch (error) {
       console.error('Error loading comments:', error)
+      return []
     } finally {
       setLoadingComments(false)
     }
@@ -82,12 +111,14 @@ export function PostCard({ post, user, onUpdate }: PostCardProps) {
         .insert([{
           post_id: post.id,
           user_id: user.id,
-          content: newComment.trim()
+          content: newComment.trim(),
+          parent_id: replyTo
         }])
 
       if (error) throw error
 
       setNewComment('')
+      setReplyTo(null)
       loadComments()
     } catch (error) {
       console.error('Error submitting comment:', error)
@@ -99,6 +130,142 @@ export function PostCard({ post, user, onUpdate }: PostCardProps) {
   useEffect(() => {
     checkVoteStatus()
   }, [user, post.id])
+
+  useEffect(() => {
+    // Auto-open comments and scroll to comment if URL has comment hash
+    if (window.location.hash) {
+      const hash = window.location.hash.substring(1)
+      if (hash.startsWith('comment-')) {
+        const commentId = hash.replace('comment-', '')
+        // Check if this comment belongs to this post
+        const commentExists = comments.some(c => c.id === commentId)
+        if (!commentExists) {
+          // Load comments and then scroll
+          setShowComments(true)
+          loadComments().then(() => {
+            setTimeout(() => {
+              const element = document.getElementById(`comment-${commentId}`)
+              if (element) {
+                element.scrollIntoView({ behavior: 'smooth', block: 'center' })
+                element.classList.add('bg-yellow-100', 'dark:bg-yellow-900', 'rounded', 'p-2', 'transition-colors', 'duration-1000')
+                setTimeout(() => {
+                  element.classList.remove('bg-yellow-100', 'dark:bg-yellow-900', 'rounded', 'p-2')
+                }, 2000)
+              }
+            }, 100)
+          })
+        } else {
+          // Comment already loaded, just scroll
+          const element = document.getElementById(`comment-${commentId}`)
+          if (element) {
+            element.scrollIntoView({ behavior: 'smooth', block: 'center' })
+            element.classList.add('bg-yellow-100', 'dark:bg-yellow-900', 'rounded', 'p-2', 'transition-colors', 'duration-1000')
+            setTimeout(() => {
+              element.classList.remove('bg-yellow-100', 'dark:bg-yellow-900', 'rounded', 'p-2')
+            }, 2000)
+          }
+        }
+      }
+    }
+  }, [comments])
+
+  const CommentItem = ({ comment, depth = 0 }: { comment: ExtendedComment; depth?: number }) => {
+    const [showReplyInput, setShowReplyInput] = useState(false)
+    
+    return (
+      <div className={`flex space-x-3 group ${depth > 0 ? 'ml-8 mt-3' : ''}`} id={`comment-${comment.id}`}>
+        <div className={`${depth > 0 ? 'w-5 h-5' : 'w-6 h-6'} rounded-full bg-[hsl(var(--secondary))] flex items-center justify-center flex-shrink-0`}>
+          <span className={`${depth > 0 ? 'text-xs' : 'text-xs'} font-medium`}>
+            {comment.profiles.username?.[0]?.toUpperCase() || 'U'}
+          </span>
+        </div>
+        <div className="flex-1">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <span className="text-sm font-medium">{comment.profiles.username}</span>
+              <span className="text-xs text-[hsl(var(--muted-foreground))]">
+                {formatDistanceToNow(new Date(comment.created_at), { addSuffix: true })}
+              </span>
+              {depth > 0 && (
+                <span className="text-xs text-[hsl(var(--muted-foreground))]">
+                  • Reply
+                </span>
+              )}
+            </div>
+            <div className="flex items-center space-x-1">
+              <button
+                onClick={() => {
+                  const url = new URL(window.location.href)
+                  url.hash = `comment-${comment.id}`
+                  navigator.clipboard.writeText(url.toString())
+                }}
+                className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-[hsl(var(--secondary))] rounded"
+                title="Copy comment link"
+              >
+                <Link2 className="w-3 h-3 text-[hsl(var(--muted-foreground))]" />
+              </button>
+              {user && (
+                <button
+                  onClick={() => {
+                    setReplyTo(comment.id)
+                    setShowReplyInput(!showReplyInput)
+                  }}
+                  className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-[hsl(var(--secondary))] rounded text-xs text-[hsl(var(--muted-foreground))]"
+                  title="Reply to comment"
+                >
+                  Reply
+                </button>
+              )}
+            </div>
+          </div>
+          <p className="text-sm text-[hsl(var(--foreground))] mt-1">{comment.content}</p>
+          
+          {user && showReplyInput && replyTo === comment.id && (
+            <div className="mt-2 flex space-x-2">
+              <input
+                type="text"
+                value={newComment}
+                onChange={(e) => setNewComment(e.target.value)}
+                onKeyPress={(e) => e.key === 'Enter' && handleComment()}
+                placeholder={`Reply to ${comment.profiles.username}...`}
+                className="flex-1 px-2 py-1 text-xs border border-[hsl(var(--border))] rounded bg-[hsl(var(--background))] text-[hsl(var(--foreground))] placeholder-[hsl(var(--muted-foreground))] focus:outline-none focus:ring-1 focus:ring-primary"
+                autoFocus
+              />
+              <button
+                onClick={handleComment}
+                disabled={!newComment.trim() || submittingComment}
+                className="px-2 py-1 bg-primary text-primary-foreground text-xs rounded hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {submittingComment ? (
+                  <div className="w-3 h-3 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
+                ) : (
+                  <Send className="w-3 h-3" />
+                )}
+              </button>
+              <button
+                onClick={() => {
+                  setReplyTo(null)
+                  setShowReplyInput(false)
+                  setNewComment('')
+                }}
+                className="px-2 py-1 text-xs text-[hsl(var(--muted-foreground))] hover:text-[hsl(var(--foreground))]"
+              >
+                Cancel
+              </button>
+            </div>
+          )}
+
+          {comment.replies && comment.replies.length > 0 && (
+            <div className="mt-3 space-y-3">
+              {comment.replies.map((reply) => (
+                <CommentItem key={reply.id} comment={reply} depth={depth + 1} />
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    )
+  }
 
   const handleVote = async () => {
     if (!user || voting) return
@@ -218,47 +385,48 @@ export function PostCard({ post, user, onUpdate }: PostCardProps) {
               <div className="text-sm text-[hsl(var(--muted-foreground))]">No comments yet</div>
             ) : (
               comments.map((comment) => (
-                <div key={comment.id} className="flex space-x-3">
-                  <div className="w-6 h-6 rounded-full bg-[hsl(var(--secondary))] flex items-center justify-center flex-shrink-0">
-                    <span className="text-xs font-medium">
-                      {comment.profiles.username?.[0]?.toUpperCase() || 'U'}
-                    </span>
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex items-center space-x-2">
-                      <span className="text-sm font-medium">{comment.profiles.username}</span>
-                      <span className="text-xs text-[hsl(var(--muted-foreground))]">
-                        {formatDistanceToNow(new Date(comment.created_at), { addSuffix: true })}
-                      </span>
-                    </div>
-                    <p className="text-sm text-[hsl(var(--foreground))] mt-1">{comment.content}</p>
-                  </div>
-                </div>
+                <CommentItem key={comment.id} comment={comment} />
               ))
             )}
           </div>
 
           {user && (
-            <div className="flex space-x-2">
-              <input
-                type="text"
-                value={newComment}
-                onChange={(e) => setNewComment(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && handleComment()}
-                placeholder="Add a comment..."
-                className="flex-1 px-3 py-2 text-sm border border-[hsl(var(--border))] rounded-md bg-[hsl(var(--background))] text-[hsl(var(--foreground))] placeholder-[hsl(var(--muted-foreground))] focus:outline-none focus:ring-2 focus:ring-primary"
-              />
-              <button
-                onClick={handleComment}
-                disabled={!newComment.trim() || submittingComment}
-                className="px-3 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {submittingComment ? (
-                  <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
-                ) : (
-                  <Send className="w-4 h-4" />
-                )}
-              </button>
+            <div>
+              {replyTo && (
+                <div className="flex items-center justify-between mb-2 text-sm text-[hsl(var(--muted-foreground))]">
+                  <span>Replying to comment...</span>
+                  <button
+                    onClick={() => {
+                      setReplyTo(null)
+                      setNewComment('')
+                    }}
+                    className="text-xs hover:text-[hsl(var(--foreground))]"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              )}
+              <div className="flex space-x-2">
+                <input
+                  type="text"
+                  value={newComment}
+                  onChange={(e) => setNewComment(e.target.value)}
+                  onKeyPress={(e) => e.key === 'Enter' && handleComment()}
+                  placeholder={replyTo ? "Write a reply..." : "Add a comment..."}
+                  className="flex-1 px-3 py-2 text-sm border border-[hsl(var(--border))] rounded-md bg-[hsl(var(--background))] text-[hsl(var(--foreground))] placeholder-[hsl(var(--muted-foreground))] focus:outline-none focus:ring-2 focus:ring-primary"
+                />
+                <button
+                  onClick={handleComment}
+                  disabled={!newComment.trim() || submittingComment}
+                  className="px-3 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {submittingComment ? (
+                    <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
+                  ) : (
+                    <Send className="w-4 h-4" />
+                  )}
+                </button>
+              </div>
             </div>
           )}
         </div>
