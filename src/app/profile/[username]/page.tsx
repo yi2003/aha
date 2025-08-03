@@ -4,17 +4,18 @@ import { User } from 'lucide-react'
 import { PostCard } from '@/components/post-card'
 
 interface ProfileProps {
-  params: {
+  params: Promise<{
     username: string
-  }
+  }>
 }
 
 export default async function ProfilePage({ params }: ProfileProps) {
+  const { username } = await params
   // Fetch user profile
   const { data: profile } = await supabase
     .from('profiles')
     .select('*')
-    .eq('username', params.username)
+    .eq('username', username)
     .single()
 
   if (!profile) {
