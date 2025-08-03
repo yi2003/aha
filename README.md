@@ -1,113 +1,87 @@
-# Aha - Gamified Knowledge Marketplace
+# Aha! - Daily Insights Social App
 
-A platform where users share one high-quality insight per day, with community voting and daily leaderboards determining the value of knowledge.
+A modern social platform for sharing and discovering daily insights and "aha!" moments.
 
 ## Features
 
-- **Daily Insights**: Share one valuable insight per day
-- **Community Voting**: Upvote the best insights with a daily limit of 5 votes
-- **Real-time Leaderboards**: Top posts and users reset daily
-- **User Profiles**: Showcase your contribution history
-- **Clean Design**: Professional, data-focused interface
+- **Daily Post Limit**: Share 1 insight per day to encourage quality over quantity
+- **Vote System**: Give up to 5 votes per day to support great insights
+- **Real-time Leaderboards**: Daily rankings for posts and users
+- **User Profiles**: Customizable profiles with avatars and bios
+- **Social Authentication**: Google and email sign-in options
+- **Responsive Design**: Works seamlessly on desktop and mobile
 
 ## Tech Stack
 
-- **Frontend**: Next.js 14 with TypeScript
-- **Styling**: Tailwind CSS
+- **Frontend**: Next.js 14 with TypeScript and App Router
+- **Styling**: Tailwind CSS v4 with CSS variables for theming
 - **Backend**: Supabase (PostgreSQL, Auth, Real-time)
+- **Database**: PostgreSQL with Row Level Security (RLS)
 - **Icons**: Lucide React
-- **Deployment**: Vercel
+- **Deployment**: Vercel-ready
 
-## Getting Started
+## Quick Start
 
-### Prerequisites
-
-- Node.js 18+ 
-- Supabase account
-- Vercel account (for deployment)
-
-### Setup
-
-1. **Clone the repository**
+1. **Clone and Install**:
    ```bash
-   git clone [your-repo-url]
+   git clone [your-repo]
    cd aha
-   ```
-
-2. **Install dependencies**
-   ```bash
    npm install
    ```
 
-3. **Set up Supabase**
-   - Create a new Supabase project
-   - Copy `supabase-schema.sql` into the SQL editor in Supabase dashboard
-   - Run the SQL to set up the database schema
-
-4. **Configure environment variables**
-   Create `.env.local`:
+2. **Environment Setup**:
+   Copy `.env.local.example` to `.env.local` and add your Supabase credentials:
    ```
    NEXT_PUBLIC_SUPABASE_URL=your-supabase-url
    NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key
    ```
 
-5. **Run development server**
+3. **Database Setup**:
+   Run the SQL schema in `supabase-schema.sql` in your Supabase dashboard
+
+4. **Add Test Data** (Optional):
    ```bash
-   npm run dev
+   # Run the test data SQL
+   psql -h your-supabase-host -U your-user -d your-db -f test-data.sql
    ```
 
-6. **Deploy to Vercel**
+5. **Start Development**:
    ```bash
-   npx vercel deploy
+   npm run dev
+   # Visit http://localhost:3000
    ```
 
 ## Database Schema
 
 ### Core Tables
-- `profiles`: User profiles
-- `posts`: Daily insights
-- `votes`: User votes on posts
-- `comments`: Comments on posts
+- `profiles`: User profiles and metadata
+- `posts`: Daily insights with content and links
+- `votes`: User votes on posts (limited to 5/day)
+- `comments`: Post comments (future feature)
 
 ### Key Features
-- **One-post-per-day**: Enforced by `can_user_post_today()` function
-- **Vote limits**: 5 votes per user per day via `get_user_votes_today()`
-- **Daily leaderboards**: Auto-resetting views for posts and users
-- **Real-time updates**: Supabase real-time subscriptions
+- Daily post limit via `can_user_post_today()` function
+- Vote tracking with `get_user_votes_today()` function
+- Auto-resetting daily leaderboards
+- Real-time subscriptions for live updates
 
-## Usage
+## API Routes
 
-### For Users
-1. **Sign up** with email/username or Google
-2. **Share insights**: One high-quality post per day
-3. **Vote wisely**: 5 votes daily to support best insights
-4. **Engage**: Comment and discuss valuable posts
+- `/api/auth/callback` - Authentication callback handler
+- `/profile/[username]` - User profile pages
+- `/` - Main leaderboard and fresh posts
 
-### For Developers
-- **Authentication**: Ready-to-use auth with social providers
-- **Real-time**: Live leaderboards and notifications
-- **Scalable**: PostgreSQL with proper indexing
-- **Secure**: Row-level security policies
+## Daily Limits
 
-## API Endpoints
+- **Posts**: 1 per user per day
+- **Votes**: 5 per user per day
+- **Leaderboards**: Reset daily at midnight UTC
 
-- `GET /` - Home page with leaderboards
-- `GET /profile/[username]` - User profile pages
-- `POST /api/posts` - Create new posts (authenticated)
-- `POST /api/votes` - Vote on posts (authenticated)
-- `GET /api/leaderboard` - Current daily rankings
+## Deployment
 
-## Development
-
+Ready for Vercel deployment:
 ```bash
-# Start development server
-npm run dev
-
-# Build for production
-npm run build
-
-# Run linting
-npm run lint
+npx vercel deploy
 ```
 
 ## Contributing
@@ -121,7 +95,3 @@ npm run lint
 ## License
 
 MIT License - see LICENSE file for details
-
-## Support
-
-For issues and questions, please open a GitHub issue or contact the development team.
